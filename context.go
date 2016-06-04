@@ -15,7 +15,9 @@
 package config
 
 import (
-	"path"
+	"errors"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -36,10 +38,14 @@ func LoadContext(confName string, confPaths []string) (*Context, error) {
 	var err error
 	var conf *Config
 	for _, confPath := range confPaths {
-		conf, err = ReadDefault(path.Join(confPath, confName))
+		path := filepath.Join(confPath, confName)
+		conf, err = ReadDefault(path)
 		if err == nil {
 			return &Context{config: conf}, nil
+		} else if _, isPathErr := err.(*os.PathError); !isPathErr {
+			return nil, errors.New(path + " " + err.Error())
 		}
+
 	}
 	return nil, err
 }
