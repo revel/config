@@ -19,7 +19,7 @@ import (
 	"strings"
 )
 
-// config constants
+// config constants.
 const (
 	// Default section name.
 	DefaultSection = "DEFAULT"
@@ -34,7 +34,7 @@ const (
 
 var (
 	// Strings accepted as boolean.
-	boolString = map[string]bool{
+	boolString = map[string]bool{ //nolint:gochecknoglobals
 		"t":     true,
 		"true":  true,
 		"y":     true,
@@ -84,7 +84,7 @@ type tValue struct {
 // comment: has to be `DefaultComment` or `AlternativeComment`
 // separator: has to be `DefaultSeparator` or `AlternativeSeparator`
 // preSpace: indicate if is inserted a space before of the separator
-// postSpace: indicate if is added a space after of the separator
+// postSpace: indicate if is added a space after of the separator.
 func New(comment, separator string, preSpace, postSpace bool) *Config {
 	if comment != DefaultComment && comment != AlternativeComment {
 		panic("comment character not valid")
@@ -102,7 +102,7 @@ func New(comment, separator string, preSpace, postSpace bool) *Config {
 	if postSpace {
 		separator += " "
 	}
-	//==
+	// ==
 
 	c := new(Config)
 
@@ -122,19 +122,19 @@ func NewDefault() *Config {
 	return New(DefaultComment, DefaultSeparator, false, true)
 }
 
-// Merge merges the given configuration "source" with this one ("target").
+// Merge merges the given configuration "source" with this one ("c").
 //
 // Merging means that any option (under any section) from source that is not in
-// target will be copied into target. When the target already has an option with
-// the same name and section then it is overwritten (i.o.w. the source wins).
-func (target *Config) Merge(source *Config) {
+// c will be copied into c. When c already has an option with the same name and
+// section then it is overwritten (i.o.w. the source wins).
+func (c *Config) Merge(source *Config) {
 	if source == nil || source.data == nil || len(source.data) == 0 {
 		return
 	}
 
 	for section, option := range source.data {
 		for optionName, optionValue := range option {
-			target.AddOption(section, optionName, optionValue.v)
+			c.AddOption(section, optionName, optionValue.v)
 		}
 	}
 }

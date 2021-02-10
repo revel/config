@@ -43,7 +43,7 @@ func (c *Config) write(buf *bufio.Writer, header string) (err error) {
 	if header != "" {
 		// Add comment character after of each new line.
 		if i := strings.Index(header, "\n"); i != -1 {
-			header = strings.Replace(header, "\n", "\n"+c.comment, -1)
+			header = strings.ReplaceAll(header, "\n", "\n"+c.comment)
 		}
 
 		if _, err = buf.WriteString(c.comment + header + "\n"); err != nil {
@@ -67,7 +67,6 @@ func (c *Config) write(buf *bufio.Writer, header string) (err error) {
 				// Follow the input order in options.
 				for i := 0; i < c.lastIDOption[section]; i++ {
 					for option, tValue := range sectionMap {
-
 						if tValue.position == i {
 							if _, err = buf.WriteString(fmt.Sprint(
 								option, c.separator, tValue.v, "\n")); err != nil {

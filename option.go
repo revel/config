@@ -14,8 +14,6 @@
 
 package config
 
-import "errors"
-
 // AddOption adds a new option and value to the configuration.
 //
 // If the section is nil then uses the section by default; if it does not exist,
@@ -71,17 +69,17 @@ func (c *Config) HasOption(section string, option string) bool {
 func (c *Config) Options(section string) (options []string, err error) {
 	// If no section passed in then assume we are only looking at the default section
 	var optionMap map[string]struct{}
-	onlyDefault := section=="" || section== DefaultSection
+	onlyDefault := section == "" || section == DefaultSection
 
-	if  onlyDefault {
+	if onlyDefault {
 		optionMap = make(map[string]struct{},
 			len(c.data[DefaultSection])+len(c.data[section]))
 	} else if _, ok := c.data[section]; !ok {
-		return nil, errors.New(SectionError(section).Error())
+		return nil, SectionError(section)
 	} else {
 		// Keep a map of option names we've seen to deduplicate.
 		optionMap = make(map[string]struct{},
-			len(c.data[DefaultSection]) + len(c.data[section]))
+			len(c.data[DefaultSection])+len(c.data[section]))
 	}
 
 	for s := range c.data[DefaultSection] {
@@ -109,7 +107,7 @@ func (c *Config) Options(section string) (options []string, err error) {
 // It returns an error if the section doesn't exist.
 func (c *Config) SectionOptions(section string) (options []string, err error) {
 	if _, ok := c.data[section]; !ok {
-		return nil, errors.New(SectionError(section).Error())
+		return nil, SectionError(section)
 	}
 
 	options = make([]string, len(c.data[section]))

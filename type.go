@@ -15,7 +15,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -23,7 +22,7 @@ import (
 	"strings"
 )
 
-// Substitutes values, calculated by callback, on matching regex
+// Substitutes values, calculated by callback, on matching regex.
 func (c *Config) computeVar(beforeValue *string, regx *regexp.Regexp, headsz, tailsz int, withVar func(*string) string) (*string, error) {
 	var i int
 	computedVal := beforeValue
@@ -37,7 +36,7 @@ func (c *Config) computeVar(beforeValue *string, regx *regexp.Regexp, headsz, ta
 		varname := (*computedVal)[vr[headsz]:vr[headsz+1]]
 		varVal := withVar(&varname)
 		if varVal == "" {
-			return &varVal, fmt.Errorf("Option not found: %s", varname)
+			return &varVal, OptionError(varname)
 		}
 
 		// substitute by new value and take off leading '%(' and trailing ')s'
@@ -50,7 +49,7 @@ func (c *Config) computeVar(beforeValue *string, regx *regexp.Regexp, headsz, ta
 	if i == DepthValues {
 		retVal := ""
 		return &retVal,
-			fmt.Errorf("Possible cycle while unfolding variables: max depth of %d reached", DepthValues)
+			fmt.Errorf("%w: max depth of %d reached", ErrCycle, DepthValues)
 	}
 
 	return computedVal, nil
@@ -66,7 +65,7 @@ func (c *Config) Bool(section string, option string) (value bool, err error) {
 
 	value, ok := boolString[strings.ToLower(sv)]
 	if !ok {
-		return false, errors.New("could not parse bool value: " + sv)
+		return false, fmt.Errorf("%w: %s", ErrParseBool, sv)
 	}
 
 	return value, nil
@@ -134,7 +133,7 @@ func (c *Config) String(section string, option string) (value string, err error)
 	computedVal, err := c.computeVar(&value, varRegExp, 2, 2, func(varName *string) string {
 		lowerVar := *varName
 		// search variable in default section as well as current section
-		varVal, _ := c.data[DefaultSection][lowerVar]
+		varVal := c.data[DefaultSection][lowerVar]
 		if _, ok := c.data[section][lowerVar]; ok {
 			varVal = c.data[section][lowerVar]
 		}

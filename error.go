@@ -14,16 +14,32 @@
 
 package config
 
-// SectionError type string
+// Error is used for constant errors.
+type Error string
+
+// Error implements the error interface.
+func (e Error) Error() string {
+	return string(e)
+}
+
+const (
+	ErrCycle     Error = "possible cycle while unfolding variables"
+	ErrParseBool Error = "could not parse bool value"
+	ErrParseLine Error = "could not parse line"
+)
+
+// SectionError type string.
 type SectionError string
 
+// Error implements the error interface.
 func (e SectionError) Error() string {
 	return "section not found: " + string(e)
 }
 
-// OptionError type string
+// OptionError type string.
 type OptionError string
 
+// Error implements the error interface.
 func (e OptionError) Error() string {
 	return "option not found: " + string(e)
 }
