@@ -30,21 +30,23 @@ const (
 
 func testGet(t *testing.T, c *Config, section string, option string,
 	expected interface{}) {
+	t.Helper()
+
 	ok := false
-	switch expected.(type) {
+	switch v := expected.(type) {
 	case string:
-		v, _ := c.String(section, option)
-		if v == expected.(string) {
+		s, _ := c.String(section, option)
+		if s == v {
 			ok = true
 		}
 	case int:
-		v, _ := c.Int(section, option)
-		if v == expected.(int) {
+		i, _ := c.Int(section, option)
+		if i == v {
 			ok = true
 		}
 	case bool:
-		v, _ := c.Bool(section, option)
-		if v == expected.(bool) {
+		b, _ := c.Bool(section, option)
+		if b == v {
 			ok = true
 		}
 	default:
@@ -313,7 +315,6 @@ func TestSectionOptions(t *testing.T) {
 	}
 
 	options, err := cr.SectionOptions("First-Section")
-
 	if err != nil {
 		t.Fatalf("SectionOptions failure: %s", err)
 	}
@@ -362,13 +363,13 @@ func TestSectionOptions(t *testing.T) {
 
 // TestMerge tests merging 2 configurations.
 func TestMerge(t *testing.T) {
-	target, error := ReadDefault(targetFilename)
-	if error != nil {
+	target, err := ReadDefault(targetFilename)
+	if err != nil {
 		t.Fatalf("Unable to read target config file '%s'", targetFilename)
 	}
 
-	source, error := ReadDefault(sourceFilename)
-	if error != nil {
+	source, err := ReadDefault(sourceFilename)
+	if err != nil {
 		t.Fatalf("Unable to read source config file '%s'", sourceFilename)
 	}
 
@@ -407,18 +408,18 @@ func TestLoadContextOneConf(t *testing.T) {
 	}
 
 	ctx.SetSection("X")
-	result, found := ctx.String("x.three")
+	result, _ := ctx.String("x.three")
 	if !strings.EqualFold("conf1-sourcex3", result) {
 		t.Errorf("Expected '[X] x.three' to be 'conf1-sourcex3' but instead it was '%s'", result)
 	}
 
-	_, found = ctx.String("x.notexists")
+	_, found := ctx.String("x.notexists")
 	if found {
 		t.Error("Config 'x.notexists' shouldn't found")
 	}
 
 	ctx.SetSection("Y")
-	result, found = ctx.String("y.one")
+	result, _ = ctx.String("y.one")
 	if !strings.EqualFold("conf1-sourcey1", result) {
 		t.Errorf("Expected '[Y] y.one' to be 'conf1-sourcey1' but instead it was '%s'", result)
 	}
@@ -437,18 +438,18 @@ func TestLoadContextMultipleConfWithPriority(t *testing.T) {
 	}
 
 	ctx.SetSection("X")
-	result, found := ctx.String("x.two")
+	result, _ := ctx.String("x.two")
 	if !strings.EqualFold("override-conf2-sourcex2", result) {
 		t.Errorf("Expected '[X] x.two' to be 'override-conf2-sourcex2' but instead it was '%s'", result)
 	}
 
-	_, found = ctx.String("x.notexists")
+	_, found := ctx.String("x.notexists")
 	if found {
 		t.Error("Config 'x.notexists' shouldn't be found")
 	}
 
 	ctx.SetSection("Y")
-	result, found = ctx.String("y.three")
+	result, _ = ctx.String("y.three")
 	if !strings.EqualFold("override-conf2-sourcey3", result) {
 		t.Errorf("Expected '[Y] y.three' to be 'override-conf2-sourcey3' but instead it was '%s'", result)
 	}

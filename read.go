@@ -42,7 +42,7 @@ func _read(fname string, c *Config) (*Config, error) {
 }
 
 // Read reads a configuration file and returns its representation.
-// All arguments, except `fname`, are related to `New()`
+// All arguments, except `fname`, are related to `New()`.
 func Read(fname string, comment, separator string, preSpace, postSpace bool) (*Config, error) {
 	return _read(fname, New(comment, separator, preSpace, postSpace))
 }
@@ -57,7 +57,7 @@ func ReadDefault(fname string) (*Config, error) {
 
 func (c *Config) read(buf *bufio.Reader) (err error) {
 	var section, option string
-	var scanner = bufio.NewScanner(buf)
+	scanner := bufio.NewScanner(buf)
 	lineNo := 0
 	for scanner.Scan() {
 		l := strings.TrimRightFunc(stripComments(scanner.Text()), unicode.IsSpace)
@@ -94,7 +94,7 @@ func (c *Config) read(buf *bufio.Reader) (err error) {
 				c.AddOption(section, option, value)
 
 			default:
-				return fmt.Errorf("could not parse line #%v: %v", lineNo, l)
+				return fmt.Errorf("%w %d: %v", ErrParseLine, lineNo, l)
 			}
 		}
 	}
